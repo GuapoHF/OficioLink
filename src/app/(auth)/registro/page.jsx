@@ -24,6 +24,8 @@ import {
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 export default function RegistroPage() {
   const supabase = createClient();
   const router = useRouter();
@@ -206,7 +208,13 @@ export default function RegistroPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative">
+      <Link
+        href="/login"
+        className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-2 text-slate-500 hover:text-[#14A5B8] transition-colors font-bold z-50 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Link>
       <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center bg-[#14A5B8] p-12 text-white">
         <Image
           src="/logo-letras.png"
@@ -215,7 +223,7 @@ export default function RegistroPage() {
           height={250}
           className="mb-6"
         />
-        <h1 className="text-5xl font-bold italic mb-4">OFICIO LINK</h1>
+
         <p className="text-xl text-center">
           Únete a la comunidad más grande de expertos y clientes.
         </p>

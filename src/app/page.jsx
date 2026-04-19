@@ -1,158 +1,206 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, MapPin, Zap, ChevronRight, Wrench } from "lucide-react";
+import {
+  ArrowRight,
+  Search,
+  ShieldCheck,
+  Star,
+  Wrench,
+  Zap,
+  Droplet,
+  Paintbrush,
+} from "lucide-react";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* 1. BARRA DE NAVEGACIÓN */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            {/* Logo de Oficio Link */}
-            <Image
-              src="/logo.png"
-              alt="Oficio Link Logo"
-              width={150}
-              height={50}
-              className="h-10 w-auto"
-            />
-          </Link>
+    <div className="min-h-screen bg-slate-50 selection:bg-[#14A5B8] selection:text-white">
+      {/* NAVBAR PÚBLICO */}
+      <nav className="fixed top-0 w-full bg-[#14A5B8] backdrop-blur-md z-50 border-b border-[#14A5B8] ">
+        <div className="max-w-7xl mx-auto px-12 h-20 flex items-center justify-between">
+          <Image
+            src="/logo-letras.png"
+            alt="Oficio Link"
+            width={150}
+            height={40}
+            className="h-full w-auto"
+          />
           <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-sm font-semibold text-slate-600 hover:text-[#14A5B8]"
-            >
-              Iniciar Sesión
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                className="font-bold text-slate-600 hover:text-[#14A5B8]"
+              >
+                Iniciar Sesión
+              </Button>
             </Link>
             <Link href="/registro">
-              <Button className="bg-[#14A5B8] hover:bg-[#0f8494] text-white">
-                Regístrate Gratis
+              <Button className="bg-[#14A5B8] hover:bg-[#0f8494] font-bold rounded-xl px-6">
+                Regístrate
               </Button>
             </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* 2. SECCIÓN HERO (Principal) */}
-      <main className="flex-1">
-        <section className="relative bg-slate-900 overflow-hidden">
-          {/* Fondo decorativo con tu color de marca */}
-          <div className="absolute inset-0 bg-[#14A5B8]/10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#14A5B8]/20 via-slate-900 to-slate-900"></div>
+      {/* HERO SECTION */}
+      <section className="pt-32 pb-20 px-6 md:pt-48 md:pb-32 overflow-hidden relative">
+        {/* Elementos decorativos de fondo */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-[#14A5B8]/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-[400px] h-[400px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-          <div className="relative max-w-7xl mx-auto px-6 py-24 sm:py-32 flex flex-col items-center text-center">
-            <BadgeOficio />
-            <h1 className="mt-8 text-5xl sm:text-7xl font-extrabold text-white tracking-tight max-w-4xl">
-              El experto ideal para tu hogar,{" "}
-              <span className="text-[#14A5B8]">a un clic de distancia.</span>
-            </h1>
-            <p className="mt-6 text-xl text-slate-300 max-w-2xl">
-              Oficio Link es la red profesional que conecta a clientes con
-              plomeros, electricistas, carpinteros y más expertos locales de
-              confianza.
-            </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Link href="/registro" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto h-14 px-8 text-lg bg-[#14A5B8] hover:bg-[#0f8494]">
-                  Necesito un Servicio <ChevronRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/registro" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto h-14 px-8 text-lg bg-transparent border-slate-600 text-slate-200 hover:bg-slate-800 hover:text-white"
-                >
-                  Soy Trabajador
-                </Button>
-              </Link>
-            </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 border border-slate-200 mb-8 text-sm font-bold text-slate-600">
+            <Star className="h-4 w-4 text-yellow-500 fill-current" /> La red de
+            oficios más confiable
           </div>
-        </section>
-
-        {/* 3. SECCIÓN DE BENEFICIOS */}
-        <section className="py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-slate-900">
-                ¿Por qué usar Oficio Link?
-              </h2>
-              <p className="mt-4 text-lg text-slate-600">
-                Diseñado para darte seguridad y rapidez en cada trabajo.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-12">
-              <FeatureCard
-                icon={<MapPin className="h-8 w-8 text-[#14A5B8]" />}
-                title="Cerca de ti"
-                description="Nuestro mapa inteligente te conecta con los trabajadores más cercanos a tu ubicación en tiempo real."
-              />
-              <FeatureCard
-                icon={<ShieldCheck className="h-8 w-8 text-[#14A5B8]" />}
-                title="Perfiles Verificados"
-                description="Revisa calificaciones, reseñas y el historial de trabajos de cada experto antes de contratarlo."
-              />
-              <FeatureCard
-                icon={<Zap className="h-8 w-8 text-[#14A5B8]" />}
-                title="Contacto Inmediato"
-                description="Sin intermediarios lentos. Chatea o llama al trabajador al instante y acuerda el servicio."
-              />
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* 4. FOOTER */}
-      <footer className="bg-slate-50 border-t py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-          <div className="flex items-center gap-2 opacity-50 grayscale">
-            <Image
-              src="/logo-letras.png"
-              alt="Logo"
-              width={100}
-              height={30}
-              className="h-6 w-auto"
-            />
-          </div>
-          <p className="text-sm text-slate-500">
-            © {new Date().getFullYear()} Oficio Link. Proyecto Escolar - Todos
-            los derechos reservados.
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight mb-8">
+            Encuentra al <span className="text-[#14A5B8]">experto ideal</span>{" "}
+            para cualquier reparación.
+          </h1>
+          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Conectamos a clientes que necesitan soluciones rápidas con
+            profesionales calificados, verificados y cerca de su ubicación.
           </p>
-          <div className="flex gap-4 text-sm font-medium text-slate-600">
-            <span className="hover:text-[#14A5B8] cursor-pointer">
-              Términos
-            </span>
-            <span className="hover:text-[#14A5B8] cursor-pointer">
-              Privacidad
-            </span>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/registro">
+              <Button className="w-full sm:w-auto bg-[#14A5B8] hover:bg-[#0f8494] text-white h-14 px-8 rounded-2xl font-bold text-lg shadow-lg shadow-[#14A5B8]/20 transition-all hover:scale-105">
+                Necesito un servicio
+              </Button>
+            </Link>
+            <Link href="/registro">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto bg-white border-2 border-slate-200 text-slate-700 hover:border-[#14A5B8] hover:text-[#14A5B8] h-14 px-8 rounded-2xl font-bold text-lg transition-all"
+              >
+                Ofrecer mis servicios <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
+      </section>
+
+      {/* SECCIÓN: ¿CÓMO FUNCIONA? */}
+      <section className="py-24 bg-white px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+              La forma inteligente de contratar
+            </h2>
+            <p className="text-slate-500 text-lg">
+              Un proceso transparente, seguro y sin complicaciones.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              {
+                icon: Search,
+                title: "1. Busca cerca de ti",
+                desc: "Usa nuestra geolocalización para encontrar expertos disponibles en tu misma zona.",
+              },
+              {
+                icon: ShieldCheck,
+                title: "2. Contrata seguro",
+                desc: "Revisa su portafolio, precios base y opiniones de otros clientes antes de decidir.",
+              },
+              {
+                icon: Star,
+                title: "3. Califica el trabajo",
+                desc: "Finaliza el servicio y deja tu reseña para ayudar a mantener la calidad de la comunidad.",
+              },
+            ].map((paso, i) => (
+              <div key={i} className="text-center group">
+                <div className="mx-auto w-20 h-20 bg-slate-50 border-2 border-slate-100 rounded-[2rem] flex items-center justify-center mb-6 group-hover:bg-[#14A5B8]/10 group-hover:border-[#14A5B8]/30 transition-all duration-300 group-hover:scale-110">
+                  <paso.icon className="h-8 w-8 text-[#14A5B8]" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">
+                  {paso.title}
+                </h3>
+                <p className="text-slate-500 leading-relaxed">{paso.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN: CATEGORÍAS POPULARES */}
+      <section className="py-24 bg-slate-50 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-slate-900 mb-10 text-center">
+            Servicios más solicitados
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              {
+                icon: Zap,
+                nombre: "Electricidad",
+                color: "text-amber-500",
+                bg: "bg-amber-100",
+              },
+              {
+                icon: Droplet,
+                nombre: "Plomería",
+                color: "text-blue-500",
+                bg: "bg-blue-100",
+              },
+              {
+                icon: Wrench,
+                nombre: "Mecánica",
+                color: "text-slate-700",
+                bg: "bg-slate-200",
+              },
+              {
+                icon: Paintbrush,
+                nombre: "Pintura",
+                color: "text-rose-500",
+                bg: "bg-rose-100",
+              },
+            ].map((cat, i) => (
+              <Link href="/registro" key={i}>
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center cursor-pointer group">
+                  <div
+                    className={`mx-auto w-14 h-14 ${cat.bg} rounded-full flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}
+                  >
+                    <cat.icon className={`h-6 w-6 ${cat.color}`} />
+                  </div>
+                  <h3 className="font-bold text-slate-900">{cat.nombre}</h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL & FOOTER */}
+      <section className="py-24 bg-slate-900 px-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-24 opacity-5 pointer-events-none">
+          <Wrench className="w-96 h-96 text-white" />
+        </div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
+            ¿Eres un experto en tu oficio?
+          </h2>
+          <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">
+            Únete a cientos de profesionales que ya están consiguiendo más
+            clientes y digitalizando su negocio con Oficio Link.
+          </p>
+          <Link href="/registro">
+            <Button className="bg-[#14A5B8] hover:bg-[#0f8494] text-white h-14 px-10 rounded-2xl font-bold text-lg shadow-xl shadow-[#14A5B8]/20">
+              Crear mi perfil profesional gratis
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <footer className="bg-slate-950 py-8 text-center border-t border-slate-800">
+        <p className="text-slate-500 text-sm">
+          © {new Date().getFullYear()} Oficio Link. Todos los derechos
+          reservados.
+        </p>
       </footer>
-    </div>
-  );
-}
-
-// Subcomponente para el pequeño botón decorativo arriba del título
-function BadgeOficio() {
-  return (
-    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
-      <Wrench className="h-4 w-4 text-[#14A5B8]" />
-      <span>La nueva era de los oficios</span>
-    </div>
-  );
-}
-
-// Subcomponente para las tarjetas de beneficios
-function FeatureCard({ icon, title, description }) {
-  return (
-    <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-slate-50 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-      <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-6">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-      <p className="text-slate-600 leading-relaxed">{description}</p>
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { Mail, Lock, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
+
+import { ArrowLeft } from "lucide-react";
 export default function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
@@ -54,9 +56,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative">
       {/* Columna Izquierda: Branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center bg-[#14A5B8] p-12 text-white text-center">
+      <Link
+        href="/"
+        className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-2 text-slate-500 hover:text-[#14A5B8] transition-colors font-bold z-50 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200 shadow-sm"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Link>
+      <div className="hidden  lg:flex lg:w-1/2 flex-col items-center justify-center bg-[#14A5B8] p-12 text-white text-center">
         <Image
           src="/logo-letras.png"
           alt="Oficio Link Logo"
@@ -64,9 +72,7 @@ export default function LoginPage() {
           height={300}
           className="mb-6 w-auto h-auto"
         />
-        <h1 className="text-5xl font-extrabold leading-tight tracking-tighter mb-4">
-          OFICIO LINK
-        </h1>
+
         <p className="text-xl font-medium max-w-md">
           La red profesional de los oficios. Conectando expertos con
           oportunidades.
