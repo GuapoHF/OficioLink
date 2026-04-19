@@ -55,38 +55,41 @@ export default function PerfilTrabajador({ params }) {
   const [pagoExitoso, setPagoExitoso] = useState(false);
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) setUsuarioActual(session.user);
+    const cargarDatos = async (userId) => {
+      // Traemos la solicitud y profundizamos en la relación con 'usuarios'
+      const { data: dataSol } = await supabase
+        .from("solicitudes")
+        .select(
+          `
+        *, 
+        usuarios(
+          nombre_completo, 
+          telefono, 
+          calle, 
+          numero_ext, 
+          numero_int, 
+          colonia, 
+          codigo_postal, 
+          referencias
+        )
+      `,
+        )
+        .eq("trabajador_id", userId)
+        .order("creado_en", { ascending: false });
 
-      // 1. Buscamos la info del trabajador
-      const { data: dataTrabajador, error: errTrabajador } = await supabase
-        .from("trabajadores")
-        .select(`*, oficios(nombre, costo_defecto)`)
-        .eq("id", id)
-        .single();
+      if (dataSol) setSolicitudes(dataSol);
 
-      if (errTrabajador) {
-        toast.error("Trabajador no encontrado");
-        router.push("/cliente");
-        return;
-      }
-
-      // 2. Buscamos sus fotos del portafolio
+      // Cargar fotos del portafolio (esto ya lo tienes)
       const { data: dataFotos } = await supabase
         .from("portafolios")
         .select("*")
-        .eq("trabajador_id", id)
+        .eq("trabajador_id", userId)
         .order("creado_en", { ascending: false });
 
-      setTrabajador(dataTrabajador);
       if (dataFotos) setPortafolios(dataFotos);
 
       setLoading(false);
     };
-
     cargarDatos();
   }, [id, router, supabase]);
 
@@ -119,7 +122,12 @@ export default function PerfilTrabajador({ params }) {
 
     // 👇 ¡AQUÍ ESTÁ EL CAMBIO PARA VER EL ERROR! 👇
     if (error) {
-      console.error("🚨 ERROR DE SUPABASE:", error);
+      console.error(
+        "🚨 ERROR DETALLADO:",
+        error.message,
+        error.details,
+        error.hint,
+      );
       toast.error(`Error DB: ${error.message}`);
       return;
     }

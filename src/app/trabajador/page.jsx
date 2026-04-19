@@ -13,6 +13,7 @@ import {
   MapPin,
   Banknote,
   Clock,
+  Phone,
   CheckCircle2,
   Loader2,
   TrendingUp,
@@ -40,17 +41,26 @@ export default function TrabajadorDashboard() {
 
   const cargarDatos = async (userId) => {
     // Cambia la consulta de solicitudes a esto:
+    // Busca esta línea y reemplázala:
     const { data: dataSol } = await supabase
       .from("solicitudes")
       .select(
         `
     *, 
-    usuarios(nombre_completo, telefono, calle, numero_ext, numero_int, colonia, codigo_postal, referencias)
+    usuarios(
+      nombre_completo, 
+      telefono, 
+      calle, 
+      numero_ext, 
+      numero_int, 
+      colonia, 
+      codigo_postal, 
+      referencias
+    )
   `,
       )
       .eq("trabajador_id", userId)
       .order("creado_en", { ascending: false });
-
     if (dataSol) setSolicitudes(dataSol);
 
     const { data: dataFotos } = await supabase
@@ -236,58 +246,114 @@ export default function TrabajadorDashboard() {
                 {solicitudes.map((sol) => (
                   <Card
                     key={sol.id}
-                    className="group border-0 shadow-sm bg-white overflow-hidden"
+                    className="group border-0 shadow-md bg-white overflow-hidden transition-all hover:shadow-lg"
                   >
                     <div className="flex">
+                      {/* Indicador de estado lateral */}
                       <div
-                        className={`w-2 ${sol.estado === "pendiente" ? "bg-amber-400" : sol.estado === "en_proceso" ? "bg-[#14A5B8]" : "bg-green-500"}`}
+                        className={`w-2 ${
+                          sol.estado === "pendiente"
+                            ? "bg-amber-400"
+                            : sol.estado === "en_proceso"
+                              ? "bg-[#14A5B8]"
+                              : "bg-green-500"
+                        }`}
                       />
+
                       <div className="flex-1 p-6">
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-6">
                           <div className="flex gap-4 items-center">
-                            <div className="bg-slate-100 h-12 w-12 rounded-full flex items-center justify-center">
-                              <User className="text-slate-400 h-6 w-6" />
+                            <div className="bg-slate-100 h-14 w-14 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                              <User className="text-slate-400 h-7 w-7" />
                             </div>
                             <div>
-                              <h3 className="font-bold text-lg text-slate-900">
-                                {sol.usuarios?.nombre_completo}
+                              {/* NOMBRE DEL CLIENTE */}
+                              <h3 className="font-extrabold text-xl text-slate-900 leading-tight">
+                                {sol.usuarios?.nombre_completo ||
+                                  "Cliente de Oficio Link"}
                               </h3>
-                              <p className="text-sm text-slate-500 flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />{" "}
+                              <p className="text-sm text-slate-500 flex items-center gap-1 font-medium">
+                                <Calendar className="h-3 w-3" /> Solicitado el{" "}
                                 {new Date(sol.creado_en).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
-                          <Badge className="uppercase text-[10px] px-3 py-1 bg-slate-100 text-slate-700">
+                          <Badge
+                            className={`uppercase text-[10px] px-3 py-1 font-bold ${
+                              sol.estado === "pendiente"
+                                ? "bg-amber-100 text-amber-700"
+                                : sol.estado === "en_proceso"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : "bg-green-100 text-green-700"
+                            }`}
+                          >
                             {sol.estado.replace("_", " ")}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 py-4 border-t border-slate-100">
-                          <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                              Detalle del servicio
+
+                        {/* SECCIÓN DE DIRECCIÓN COMPLETA */}
+                        <div className="bg-slate-50 rounded-2xl p-5 mb-6 border border-slate-100">
+                          <p className="text-[10px] text-[#14A5B8] uppercase font-black tracking-widest mb-3 flex items-center gap-2">
+                            <MapPin className="h-3 w-3" /> Ubicación del
+                            Servicio
+                          </p>
+                          <div className="text-slate-700 space-y-1">
+                            <p className="font-bold text-base">
+                              {sol.usuarios?.calle} #{sol.usuarios?.numero_ext}
+                              {sol.usuarios?.numero_int
+                                ? ` (Int. ${sol.usuarios?.numero_int})`
+                                : ""}
                             </p>
-                            <p className="text-sm text-slate-700 font-medium">
+                            <p className="text-sm">
+                              Colonia {sol.usuarios?.colonia}, C.P.{" "}
+                              {sol.usuarios?.codigo_postal}
+                            </p>
+                            {sol.usuarios?.referencias && (
+                              <div className="mt-3 pt-3 border-t border-slate-200/60">
+                                <p className="text-xs text-slate-500 italic">
+                                  <span className="font-bold text-slate-400 not-italic uppercase text-[9px] block mb-1">
+                                    Referencias:
+                                  </span>
+                                  {sol.usuarios?.referencias}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6 py-4 border-t border-slate-100">
+                          <div>
+                            <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">
+                              Servicio
+                            </p>
+                            <p className="text-sm text-slate-800 font-semibold">
                               {sol.servicio_detalle}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
-                              Pago esperado
+                            <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">
+                              Pago y Contacto
                             </p>
-                            <p className="text-sm text-slate-700 flex items-center gap-1 font-medium">
-                              <Banknote className="h-4 w-4 text-green-500" />{" "}
-                              {sol.metodo_pago}
-                            </p>
+                            <div className="space-y-1">
+                              <p className="text-sm text-slate-800 flex items-center gap-1 font-semibold">
+                                <Banknote className="h-4 w-4 text-green-500" />{" "}
+                                {sol.metodo_pago}
+                              </p>
+                              <p className="text-sm text-slate-800 flex items-center gap-1 font-semibold">
+                                <Phone className="h-4 w-4 text-blue-500" />{" "}
+                                {sol.usuarios?.telefono}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex gap-3 mt-4">
+
+                        <div className="flex gap-3 mt-6">
                           {sol.estado === "pendiente" && (
                             <Button
                               onClick={() =>
                                 actualizarEstado(sol.id, "en_proceso")
                               }
-                              className="flex-1 bg-[#14A5B8] hover:bg-[#0f8494]"
+                              className="flex-1 bg-[#14A5B8] hover:bg-[#0f8494] shadow-lg shadow-[#14A5B8]/20 h-12 rounded-xl font-bold"
                             >
                               Aceptar Trabajo
                             </Button>
@@ -297,29 +363,10 @@ export default function TrabajadorDashboard() {
                               onClick={() =>
                                 actualizarEstado(sol.id, "completado")
                               }
-                              className="flex-1 bg-green-600 hover:bg-green-700"
+                              className="flex-1 bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/20 h-12 rounded-xl font-bold"
                             >
-                              Finalizar Trabajo
+                              Marcar como Finalizado
                             </Button>
-                          )}
-                        </div>
-                        {/* Agrega esto dentro del div "flex-1 p-6" de la tarjeta del trabajador */}
-                        <div className="bg-slate-50 p-4 rounded-xl mt-4 border border-slate-100">
-                          <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2 flex items-center gap-1">
-                            <MapPin className="h-3 w-3" /> Dirección del Cliente
-                          </p>
-                          <p className="text-sm font-medium text-slate-800">
-                            {sol.usuarios?.calle} #{sol.usuarios?.numero_ext}
-                            {sol.usuarios?.numero_int
-                              ? ` (Int. ${sol.usuarios?.numero_int})`
-                              : ""}
-                            ,{sol.usuarios?.colonia}, C.P.{" "}
-                            {sol.usuarios?.codigo_postal}
-                          </p>
-                          {sol.usuarios?.referencias && (
-                            <p className="text-xs text-slate-500 mt-1 italic">
-                              {sol.usuarios?.referencias}
-                            </p>
                           )}
                         </div>
                       </div>
