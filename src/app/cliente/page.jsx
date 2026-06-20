@@ -272,11 +272,11 @@ export default function ClienteDashboard() {
     );
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC]">
+    <div className="app-shell flex min-h-screen">
       <Sidebar rol="cliente" />
 
       <div className="flex-1 md:ml-64 flex flex-col">
-        <header className="md:hidden flex justify-between items-center bg-white p-4 border-b border-slate-200">
+        <header className="md:hidden flex justify-between items-center bg-white/90 p-4 border-b border-slate-200 backdrop-blur">
           <Image
             src="/logo-letras.png"
             alt="Oficio Link"
@@ -287,60 +287,78 @@ export default function ClienteDashboard() {
           <BotonSalir />
         </header>
 
-        <main className="flex-1 p-6 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
-          <div className="bg-slate-950 rounded-2xl p-8 md:p-10 text-white shadow-xl">
-            <div className="flex flex-col lg:flex-row justify-between gap-6">
+        <main className="flex-1 p-5 md:p-10 space-y-8 max-w-7xl mx-auto w-full">
+          <div className="hero-panel p-7 md:p-10">
+            <div className="relative z-10 flex flex-col lg:flex-row justify-between gap-8">
               <div className="max-w-2xl">
-                <p className="text-[#14A5B8] font-bold uppercase tracking-widest text-xs mb-3">
+                <p className="text-cyan-100 font-bold uppercase tracking-widest text-xs mb-3">
                   Red profesional de oficios
                 </p>
                 <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
                   Encuentra expertos por oficio, cobertura y presupuesto.
                 </h1>
-                <p className="mt-4 text-slate-300 text-base md:text-lg">
+                <p className="mt-4 text-cyan-50/85 text-base md:text-lg max-w-xl">
                   Filtra, revisa su perfil y agenda una visita para cotizar antes de contratar.
                 </p>
+                <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="stat-pill">
+                    <span className="block text-2xl font-black">{trabajadores.length}</span>
+                    Expertos activos
+                  </div>
+                  <div className="stat-pill">
+                    <span className="block text-2xl font-black">{oficios.length}</span>
+                    Oficios disponibles
+                  </div>
+                  <div className="stat-pill">
+                    <span className="block text-2xl font-black">{historial.length}</span>
+                    Servicios solicitados
+                  </div>
+                </div>
               </div>
-              <Button
-                onClick={obtenerMiUbicacion}
-                className="h-12 px-6 rounded-xl bg-[#14A5B8] hover:bg-[#0f8494] text-white font-semibold"
-              >
-                <MapPin className="mr-2 h-5 w-5" />
-                Usar mi ubicación
-              </Button>
+              <div className="flex lg:items-start">
+                <Button
+                  onClick={obtenerMiUbicacion}
+                  className="h-12 px-6 rounded-xl bg-white text-slate-950 hover:bg-cyan-50 font-black shadow-lg shadow-slate-950/20"
+                >
+                  <MapPin className="mr-2 h-5 w-5 text-[#14A5B8]" />
+                  Usar mi ubicación
+                </Button>
+              </div>
             </div>
           </div>
 
           <Tabs defaultValue="buscar" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-slate-200/50 p-1 rounded-xl">
+            <TabsList className="surface-card grid w-full max-w-md grid-cols-2 mb-8 p-1">
               <TabsTrigger
                 value="buscar"
-                className="rounded-lg data-[state=active]:bg-[#14A5B8] data-[state=active]:text-white transition-all"
+                className="rounded-xl data-[state=active]:bg-[#14A5B8] data-[state=active]:text-white transition-all"
               >
                 Buscar Expertos
               </TabsTrigger>
               <TabsTrigger
                 value="historial"
-                className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all"
+                className="rounded-xl data-[state=active]:bg-slate-900 data-[state=active]:text-white transition-all"
               >
                 Mis Contrataciones ({historial.length})
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="buscar" className="space-y-6">
-              <Card className="border-0 shadow-sm rounded-2xl bg-white">
+              <Card className="surface-card">
                 <CardContent className="p-6 space-y-5">
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                       <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                        <Filter className="h-5 w-5 text-[#14A5B8]" />
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#14A5B8]/10">
+                          <Filter className="h-5 w-5 text-[#14A5B8]" />
+                        </span>
                         Filtros de búsqueda
                       </h2>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-500 mt-1">
                         Puedes combinar varios oficios y rango de precio.
                       </p>
                     </div>
-                    <Button variant="outline" onClick={limpiarFiltros}>
+                    <Button variant="outline" onClick={limpiarFiltros} className="h-10 rounded-xl">
                       Limpiar
                     </Button>
                   </div>
@@ -350,18 +368,18 @@ export default function ClienteDashboard() {
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                       <Input
                         placeholder="Nombre, oficio o zona"
-                        className="pl-10 h-11"
+                        className="filter-field pl-10"
                         value={busqueda}
                         onChange={(e) => setBusqueda(e.target.value)}
                       />
                     </div>
                     <Input
                       placeholder="Zona"
-                      className="h-11"
+                      className="filter-field"
                       value={zonaFiltro}
                       onChange={(e) => setZonaFiltro(e.target.value)}
                     />
-                    <label className="h-11 rounded-lg border border-slate-200 flex items-center gap-2 px-3 text-sm font-semibold text-slate-600">
+                    <label className="filter-field flex items-center gap-2 px-3 text-sm font-semibold text-slate-600">
                       <input
                         type="checkbox"
                         checked={soloVerificados}
@@ -382,10 +400,10 @@ export default function ClienteDashboard() {
                             key={oficio.id}
                             type="button"
                             onClick={() => toggleOficioFiltro(oficio.id)}
-                            className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
+                            className={`filter-chip ${
                               oficiosFiltro.includes(String(oficio.id))
-                                ? "bg-slate-900 text-white border-slate-900"
-                                : "bg-white text-slate-600 border-slate-200"
+                                ? "filter-chip-active"
+                                : "filter-chip-idle"
                             }`}
                           >
                             {oficio.nombre}
@@ -402,6 +420,7 @@ export default function ClienteDashboard() {
                           type="number"
                           min="0"
                           placeholder="Mínimo"
+                          className="filter-field"
                           value={precioMin}
                           onChange={(e) => setPrecioMin(e.target.value)}
                         />
@@ -409,6 +428,7 @@ export default function ClienteDashboard() {
                           type="number"
                           min="0"
                           placeholder="Máximo"
+                          className="filter-field"
                           value={precioMax}
                           onChange={(e) => setPrecioMax(e.target.value)}
                         />
@@ -418,9 +438,12 @@ export default function ClienteDashboard() {
                 </CardContent>
               </Card>
 
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-slate-500">
+              <div className="flex items-center justify-between rounded-2xl border border-white/70 bg-white/65 px-5 py-3 shadow-sm backdrop-blur">
+                <p className="text-sm font-bold text-slate-600">
                   {trabajadoresFiltrados.length} expertos encontrados
+                </p>
+                <p className="hidden sm:block text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Ordenados para comparar rápido
                 </p>
               </div>
 
@@ -439,7 +462,7 @@ export default function ClienteDashboard() {
                   return (
                     <Card
                       key={trabajador.id}
-                      className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 rounded-2xl overflow-hidden bg-white"
+                      className="expert-card overflow-hidden"
                     >
                       <CardContent className="p-0">
                         <div className="p-6 space-y-4">
@@ -450,7 +473,7 @@ export default function ClienteDashboard() {
                                 `https://api.dicebear.com/7.x/avataaars/svg?seed=${trabajador.nombre_completo}`
                               }
                               alt="Avatar"
-                              className="w-16 h-16 bg-slate-100 rounded-2xl border border-slate-200 object-cover"
+                              className="w-16 h-16 bg-slate-100 rounded-2xl border-4 border-white object-cover shadow-md ring-1 ring-slate-200"
                             />
                             <Badge
                               className={
@@ -488,17 +511,17 @@ export default function ClienteDashboard() {
                           </div>
 
                           <div className="grid grid-cols-2 gap-3 text-sm">
-                            <p className="flex items-center gap-2 text-slate-600">
+                            <p className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-slate-600">
                               <MapPin className="h-4 w-4 text-slate-400" />
                               {distancia ? `${distancia} km` : trabajador.nombre_zona}
                             </p>
-                            <p className="flex items-center gap-2 text-slate-600">
+                            <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-emerald-800">
                               <Banknote className="h-4 w-4 text-green-500" />
                               Desde ${precioBase || "N/D"}
                             </p>
                           </div>
                         </div>
-                        <div className="p-4 border-t bg-slate-50">
+                        <div className="soft-divider p-4 bg-slate-50/80">
                           <Link href={`/perfil/${trabajador.id}`}>
                             <Button className="w-full bg-slate-900 hover:bg-[#14A5B8] text-white h-11 rounded-xl">
                               Ver perfil y agendar
@@ -513,7 +536,7 @@ export default function ClienteDashboard() {
             </TabsContent>
 
             <TabsContent value="historial" className="space-y-6">
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+              <div className="surface-card p-8 flex justify-between items-center">
                 <div>
                   <h2 className="text-3xl font-bold text-slate-900">
                     Tu Historial de Servicios
@@ -526,7 +549,7 @@ export default function ClienteDashboard() {
               </div>
 
               {historial.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+                <div className="surface-card text-center py-20 border-dashed border-slate-300">
                   <Clock className="h-12 w-12 text-slate-300 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-slate-700">
                     Aún no has contratado a nadie
@@ -540,7 +563,7 @@ export default function ClienteDashboard() {
                   {historial.map((item) => (
                     <Card
                       key={item.id}
-                      className="border-0 shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow flex flex-col rounded-2xl"
+                      className="expert-card overflow-hidden flex flex-col"
                     >
                       <div className="flex flex-col md:flex-row">
                         <div
