@@ -797,19 +797,40 @@ function CamposBasicos({
     <>
       <div className="grid gap-2">
         <Label>Nombre Completo</Label>
-        <Input name="nombre" disabled={disabled} required />
+        <Input
+          name="nombre"
+          placeholder="Ej. Juan Pérez García"
+          autoComplete="name"
+          disabled={disabled}
+          required
+        />
       </div>
       <div className="grid gap-2">
         <Label>Teléfono</Label>
-        <Input name="telefono" type="tel" disabled={disabled} required />
+        <Input
+          name="telefono"
+          type="tel"
+          placeholder="Ej. 811 234 5678"
+          autoComplete="tel"
+          disabled={disabled}
+          required
+        />
       </div>
       <div className="grid gap-2">
         <Label>Correo</Label>
-        <Input name="email" type="email" autoComplete="email" disabled={disabled} required />
+        <Input
+          name="email"
+          type="email"
+          placeholder="Ej. nombre@correo.com"
+          autoComplete="email"
+          disabled={disabled}
+          required
+        />
       </div>
       <PasswordField
         disabled={disabled}
         autoComplete="new-password"
+        placeholder="Ej. TrabajoSeguro#25"
         helperText="Debe incluir una mayúscula y un símbolo especial."
         showStrength
         value={password}

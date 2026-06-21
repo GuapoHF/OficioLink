@@ -18,6 +18,7 @@ export default function PasswordField({
   disabled = false,
   helperText = "Revisa que no tengas Bloq Mayús activo.",
   autoComplete = "current-password",
+  placeholder = "Ej. OficioLink#2026",
   required = true,
   showStrength = false,
   value,
@@ -90,6 +91,7 @@ export default function PasswordField({
           name={name}
           type={mostrarPassword ? "text" : "password"}
           autoComplete={autoComplete}
+          placeholder={placeholder}
           className="h-11 pl-10 pr-12"
           required={required}
           disabled={disabled}
