@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,8 @@ export default function RegistroPage() {
   const [identidadFile, setIdentidadFile] = useState(null);
   const [selfieFile, setSelfieFile] = useState(null);
   const [resultadoVerificacion, setResultadoVerificacion] = useState(null);
+  const [verificandoIdentidad, setVerificandoIdentidad] = useState(false);
+  const verificacionSecuencia = useRef(0);
   const [location, setLocation] = useState({ lat: null, lng: null, name: "" });
   const [direccion, setDireccion] = useState({
     calle: "",
@@ -102,6 +104,49 @@ export default function RegistroPage() {
 
   const actualizarDatoTrabajador = (campo, valor) => {
     setDatosTrabajador((actuales) => ({ ...actuales, [campo]: valor }));
+  };
+
+  const revisarIdentidadAutomatica = async (documento, selfie) => {
+    verificacionSecuencia.current += 1;
+    const solicitudActual = verificacionSecuencia.current;
+
+    if (!documento || !selfie) {
+      setResultadoVerificacion(null);
+      setVerificandoIdentidad(false);
+      return;
+    }
+
+    setVerificandoIdentidad(true);
+    setResultadoVerificacion(null);
+
+    try {
+      const resultado = await verificarIdentidadLocal(documento, selfie);
+      if (verificacionSecuencia.current === solicitudActual) {
+        setResultadoVerificacion(resultado);
+      }
+    } catch (error) {
+      if (verificacionSecuencia.current !== solicitudActual) return;
+      setResultadoVerificacion({
+        estado: "pendiente",
+        score: null,
+        metodo: "comparacion_facial_local",
+        mensaje: `Archivos recibidos. No se pudo completar la revisión automática: ${error.message}`,
+      });
+    } finally {
+      if (verificacionSecuencia.current === solicitudActual) {
+        setVerificandoIdentidad(false);
+      }
+    }
+  };
+
+  const seleccionarIdentidad = (archivo) => {
+    setIdentidadFile(archivo);
+    revisarIdentidadAutomatica(archivo, selfieFile);
+  };
+
+  const seleccionarSelfie = (archivo) => {
+    setSelfieFile(archivo);
+    revisarIdentidadAutomatica(identidadFile, archivo);
   };
 
   const avanzarPasoTrabajador = () => {
@@ -269,6 +314,12 @@ export default function RegistroPage() {
 
   const handleRegistro = async (e, tipo) => {
     e.preventDefault();
+
+    if (tipo === "trabajador" && pasoTrabajador < 3) {
+      avanzarPasoTrabajador();
+      return;
+    }
+
     setLoading(true);
     setMensajeError("");
     setEstadoRegistro("Creando tu cuenta segura...");
@@ -327,12 +378,9 @@ export default function RegistroPage() {
       return;
     }
 
-    if (
-      tipo === "trabajador" &&
-      ((identidadFile && !selfieFile) || (!identidadFile && selfieFile))
-    ) {
+    if (tipo === "trabajador" && (!identidadFile || !selfieFile)) {
       const mensaje =
-        "Para verificar automáticamente, sube identificación y selfie. Si no las tienes ahora, deja ambos campos vacíos.";
+        "Para crear tu perfil de trabajador, sube tu INE o identificación y una foto de tu rostro.";
       setMensajeError(mensaje);
       setEstadoRegistro("");
       toast.error(mensaje);
@@ -387,15 +435,13 @@ export default function RegistroPage() {
     }
 
     try {
-      setResultadoVerificacion(null);
-      setEstadoRegistro("Comparando identificación y selfie, si las agregaste...");
-      const resultadoIdentidad = await verificarIdentidadLocal(
-        identidadFile,
-        selfieFile,
-      );
+      setEstadoRegistro("Revisando identificación y foto del rostro...");
+      const resultadoIdentidad =
+        resultadoVerificacion ||
+        (await verificarIdentidadLocal(identidadFile, selfieFile));
       setResultadoVerificacion(resultadoIdentidad);
 
-      setEstadoRegistro("Subiendo foto y documentos, si los agregaste...");
+      setEstadoRegistro("Subiendo foto y documentos...");
       const avatarUrl = await subirArchivo("avatares", avatarFile, userId, "perfil");
       const identidadUrl = await subirArchivo(
         "verificaciones_identidad",
@@ -423,13 +469,13 @@ export default function RegistroPage() {
         avatar_url: avatarUrl,
         identidad_url: identidadUrl,
         identidad_selfie_url: selfieUrl,
-        verificacion_estado: resultadoIdentidad?.estado || "sin_enviar",
+        verificacion_estado: resultadoIdentidad?.estado || "pendiente",
         verificacion_score: resultadoIdentidad?.score ?? null,
         verificacion_metodo: resultadoIdentidad?.metodo || null,
-        verificacion_mensaje: resultadoIdentidad?.mensaje || null,
-        verificacion_actualizada_en: resultadoIdentidad
-          ? new Date().toISOString()
-          : null,
+        verificacion_mensaje:
+          resultadoIdentidad?.mensaje ||
+          "INE y foto del rostro recibidos para revisión de identidad.",
+        verificacion_actualizada_en: new Date().toISOString(),
       };
 
       setEstadoRegistro("Guardando tu perfil profesional...");
@@ -793,13 +839,14 @@ export default function RegistroPage() {
                     <StepHeader
                       icon={ShieldCheck}
                       title="Verificación de identidad"
-                      description="Este paso ayuda a dar confianza. Sube tu INE o identificación y una selfie para comparar los rostros."
+                      description="Para terminar, sube tu INE o identificación y una foto clara de tu rostro. Con eso registramos tu verificación."
                     />
 
                     <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">
-                      La verificación es opcional para crear la cuenta, pero los
-                      clientes verán mejor tu perfil si queda aprobada. Para la
-                      comparación automática, usa imágenes claras en lugar de PDF.
+                      Este paso evita perfiles incompletos. Al subir ambos archivos,
+                      el sistema intenta revisarlos automáticamente; si el navegador
+                      no puede comparar rostros, la cuenta se crea con revisión
+                      pendiente.
                     </div>
 
                     <div className="grid grid-cols-1 gap-4">
@@ -811,11 +858,12 @@ export default function RegistroPage() {
                         <Input
                           type="file"
                           accept="image/*,.pdf"
-                          onChange={(e) => setIdentidadFile(e.target.files?.[0] || null)}
+                          onChange={(e) => seleccionarIdentidad(e.target.files?.[0] || null)}
+                          required
                         />
                         <p className="text-xs text-slate-500">
-                          Foto frontal, legible y sin reflejos. Si subes PDF, quedará
-                          pendiente para revisión.
+                          Puede ser una foto del INE o un PDF. Si quieres revisión
+                          automática de rostro, usa una foto clara.
                         </p>
                       </div>
                       <div className="space-y-2">
@@ -826,13 +874,25 @@ export default function RegistroPage() {
                         <Input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => setSelfieFile(e.target.files?.[0] || null)}
+                          onChange={(e) => seleccionarSelfie(e.target.files?.[0] || null)}
+                          required
                         />
                         <p className="text-xs text-slate-500">
                           Rostro de frente, buena iluminación y sin lentes oscuros.
                         </p>
                       </div>
                     </div>
+
+                    {verificandoIdentidad && (
+                      <div
+                        role="status"
+                        aria-live="polite"
+                        className="flex items-center gap-3 rounded-2xl border border-[#14A5B8]/20 bg-[#14A5B8]/10 p-4 text-sm font-semibold text-[#0f8494]"
+                      >
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Revisando tus archivos automáticamente...
+                      </div>
+                    )}
 
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                       <p className="font-black text-slate-900">Resumen antes de crear</p>
@@ -893,7 +953,8 @@ export default function RegistroPage() {
                     </Button>
                   ) : (
                     <Button
-                      disabled={loading}
+                      type="submit"
+                      disabled={loading || verificandoIdentidad || !identidadFile || !selfieFile}
                       className="bg-[#14A5B8] h-12 rounded-xl font-bold"
                     >
                       {loading ? (
